@@ -9,4 +9,6 @@ load("mat_fac.RData")
 
 p <- result[[1]]
 q <- result[[2]]
+write.csv(p, file = "p.csv")
+write.csv(q, file = "q.csv")
 ```
