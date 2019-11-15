@@ -1,0 +1,12 @@
+---
+title: "sl_ads_proj4"
+author: "lisixuan"
+date: "2019/11/14"
+output: html_document
+---
+```{r}
+load("mat_fac.RData") 
+
+p <- result[[1]]
+q <- result[[2]]
+```
