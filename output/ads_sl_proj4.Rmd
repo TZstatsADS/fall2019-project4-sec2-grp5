@@ -12,3 +12,22 @@ q <- result[[2]]
 write.csv(p, file = "p.csv")
 write.csv(q, file = "q.csv")
 ```
+
+```{r}
+load("mat_fac_g5.RData") 
+
+p <- result[[1]]
+q <- result[[2]]
+write.csv(p, file = "p_5.csv")
+write.csv(q, file = "q_5.csv")
+
+b_user <- result[[3]]
+write.csv(p, file = "b_user.csv")
+
+b_item <- result[[4]]
+write.csv(p, file = "b_item.csv")
+
+b_time <- result[[5]]
+write.csv(p, file = "b_time.csv")
+```
+
