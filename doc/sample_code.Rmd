@@ -23,13 +23,6 @@ library(tidyr)
 library(ggplot2)
 data <- read.csv("../data/ml-latest-small/ratings.csv")
 set.seed(0)
-test_idx <- sample(1:nrow(data), round(nrow(data)/5, 0))
-train_idx <- setdiff(1:nrow(data), test_idx)
-data_train <- data[train_idx,]
-data_test <- data[test_idx,]
-```
-
-```{r}
 ## Binning the timestamp and add a column representing the bin that the time belongs to
 ## Here we choose the number of bins to be 30 
 ## That is to say, we create a b(i,Bin(t))  of size number of rating x 30 
@@ -41,11 +34,15 @@ data_test <- data[test_idx,]
             cut_dates = cut( convt_dates, breaks = "1 year", labels = paste(1:23))  
             # adding the bin number to the train dataset 
             data  = data %>% mutate(group =cut_dates)
+            
+            
+            
+test_idx <- sample(1:nrow(data), round(nrow(data)/5, 0))
+train_idx <- setdiff(1:nrow(data), test_idx)
+data_train <- data[train_idx,]
+data_test <- data[test_idx,]
 ```
 
-```{r}
-data
-```
 
 ###Step 2 Matrix Factorization
 #### Step 2.1 Algorithm and Regularization
@@ -85,12 +82,12 @@ f_l <- expand.grid(f_list, l_list)
 ```
 
 ```{r, eval=FALSE}
-result_summary <- array(NA, dim = c(nrow(f_l), 10, 4)) 
+result_summary <- array(NA, dim = c(nrow(f_l), 4, 4)) 
 run_time <- system.time(for(i in 1:nrow(f_l)){
     par <- paste("f = ", f_l[i,1], ", lambda = ", 10^f_l[i,2])
     cat(par, "\n")
     current_result <- cv.function(data, K = 5, f = f_l[i,1], lambda = 10^f_l[i,2])
-    result_summary[,,i] <- matrix(unlist(current_result), ncol = 10, byrow = T) 
+    result_summary[,,i] <- matrix(unlist(current_result), ncol = 4, byrow = T) 
     print(result_summary)
   
 })
@@ -99,7 +96,12 @@ save(result_summary, file = "../output/rmse.Rdata")
 ```
 
 ```{r}
-load("../output/rmse.Rdata")
+save(result_summary, file = "../output/cv_rmse.Rdata")
+```
+
+
+```{r}
+load("../output/cv_rmse.Rdata")
 rmse <- data.frame(rbind(t(result_summary[1,,]), t(result_summary[2,,])), train_test = rep(c("Train", "Test"), each = 4), par = rep(paste("f = ", f_l[,1], ", lambda = ", 10^f_l[,2]), times = 2)) %>% gather("epoch", "RMSE", -train_test, -par)
 rmse$epoch <- as.numeric(gsub("X", "", rmse$epoch))
 rmse %>% ggplot(aes(x = epoch, y = RMSE, col = train_test)) + geom_point() + facet_grid(~par)
@@ -118,7 +120,7 @@ P3:[Postprocessing SVD with kernel ridge regression](./paper/P2 Improving regula
 P4:[Linearly combination of predictors](./paper/P4 Large-scale Parallel Collaborative Filtering for the Netflix Prize.pdf) Section 4.1
 
 ```{r, eval= FALSE}
-result <- gradesc(f = 10, lambda = 0.1,lrate = 0.01, max.iter = 100, stopping.deriv = 0.01,
+result <- gradesc(f = 10, lambda = 0.1,lrate = 0.01, max.iter = 40, stopping.deriv = 0.01,
                    data = data, train = data_train, test = data_test)
 
 save(result, file = "../output/mat_fac.RData")
