@@ -13,12 +13,12 @@ Term: Fall 2019
 	+ team member 4:  Wu, Qiqi qw2273@columbia.edu
 	+ team member 5:  Xiao, Lihao lx2219@columbia.edu
 + Project summary: 
-##### Table of Contents  
-[Headers](#headers)  
-[Emphasis](#emphasis)  
-...snip...    
-<a name="headers"/>
-## Headers
+Algorithm | Regularization |  Post-processing
+------------ | ------------- | -------------
+Stochastic Gradient Descent | Temporal Dynamics  | KNN
+ Alternating Least Squares| Temporal Dynamics  | KNN
+
+
 **Contribution statement**: [default] All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
