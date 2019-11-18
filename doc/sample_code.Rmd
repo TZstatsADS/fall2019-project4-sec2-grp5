@@ -29,6 +29,24 @@ data_train <- data[train_idx,]
 data_test <- data[test_idx,]
 ```
 
+```{r}
+## Binning the timestamp and add a column representing the bin that the time belongs to
+## Here we choose the number of bins to be 30 
+## That is to say, we create a b(i,Bin(t))  of size number of rating x 30 
+
+#convert timestamps to date format 
+            convt_dates =  as.Date( as.POSIXct(  data$timestamp , origin = "1970-01-01", tz = "UTC")  )   
+            date_range = max(convt_dates) - min (convt_dates)  ## 8214 days/ 1173 weeeks 
+            # the  dates breaks into 30 bins with 1 year in each bin 
+            cut_dates = cut( convt_dates, breaks = "1 year", labels = paste(1:23))  
+            # adding the bin number to the train dataset 
+            data  = data %>% mutate(group =cut_dates)
+```
+
+```{r}
+data
+```
+
 ###Step 2 Matrix Factorization
 #### Step 2.1 Algorithm and Regularization
 Here I perform stochastic gradien descent to do matrix factorization.
