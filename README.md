@@ -5,21 +5,33 @@
 Term: Fall 2019
 
 + Team 5
-+ Projec title: Lorem ipsum dolor sit amet
+
++ Project title: TO BE CHANGED 
+
 + Team members
-	+ team member 1:  Li, Sixuan sl4410@columbia.edu
-	+ team member 2:  Mathew, Jess jm4742@columbia.edu
-	+ team member 3:  Mbithe, Nicole ncm2144@columbia.edu
-	+ team member 4:  Wu, Qiqi qw2273@columbia.edu
-	+ team member 5:  Xiao, Lihao lx2219@columbia.edu
+	+   Li, Sixuan sl4410@columbia.edu
+	+   Mathew, Jess jm4742@columbia.edu
+	+   Mbithe, Nicole ncm2144@columbia.edu
+	+   Wu, Qiqi qw2273@columbia.edu
+	+  Xiao, Lihao lx2219@columbia.edu
+	
 + Project summary: 
-Algorithm | Regularization |  Post-processing
------------- | ------------- | -------------
-Stochastic Gradient Descent | Temporal Dynamics  | KNN
- Alternating Least Squares| Temporal Dynamics  | KNN
+In this project, we are going to explore matrix factorization methods for recommender system and make comparison between Stochastic Gradient Descent(SGD) and Alternating Least Squares(ALS) algorithms with same regularization and post-processing methods.
 
+    Algorithm                   | Regularization     | Post-processing
+    --------------------------- | -------------------| -------------
+    Stochastic Gradient Descent | Temporal Dynamics  | KNN
+     Alternating Least Squares  | Temporal Dynamics  | KNN
+     
+   The data we use, created by 610 users,  is achieved from [MovieLens] on September 26, 2018. These data contains 100836 ratings and 3683 tag   applications across 9742 movies between March 29, 1996 and September 24, 2018. 
+   
+   The project is divided into three steps:
+    + Implementing Algorithm, Regularization and Parameter Tuning
+    + Postprocessing 
+    + Evaluation
+   
 
-**Contribution statement**: [default] All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
+**Contribution statement**:[default] All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
