@@ -14,7 +14,7 @@ In this project, you are going to explore matrix factorization methods for recom
 
 - postpocessing
 
-It is highly recommended to read this [review paper](./paper/P1 Recommender-Systems.pdf).
+
 
 ### Step 1 Load Data and Train-test Split
 ```{r}
@@ -23,9 +23,11 @@ library(tidyr)
 library(ggplot2)
 data <- read.csv("../data/ml-latest-small/ratings.csv")
 set.seed(0)
+
+
 ## Binning the timestamp and add a column representing the bin that the time belongs to
-## Here we choose the number of bins to be 30 
-## That is to say, we create a b(i,Bin(t))  of size number of rating x 30 
+## Here we choose the number of bins to be 23 (One bin per year)
+## That is to say, we create a b(i,Bin(t))  of size number of rating x 23
 
 #convert timestamps to date format 
             convt_dates =  as.Date( as.POSIXct(  data$timestamp , origin = "1970-01-01", tz = "UTC")  )   
@@ -36,7 +38,6 @@ set.seed(0)
             data  = data %>% mutate(group =cut_dates)
             
             
-            
 test_idx <- sample(1:nrow(data), round(nrow(data)/5, 0))
 train_idx <- setdiff(1:nrow(data), test_idx)
 data_train <- data[train_idx,]
@@ -44,7 +45,8 @@ data_test <- data[test_idx,]
 ```
 
 
-###Step 2 Matrix Factorization
+### SDG Algorithm with time dynamic Regularization
+
 #### Step 2.1 Algorithm and Regularization
 Here I perform stochastic gradien descent to do matrix factorization.
 
@@ -92,13 +94,10 @@ run_time <- system.time(for(i in 1:nrow(f_l)){
   
 })
 
-save(result_summary, file = "../output/rmse.Rdata")
-```
-
-```{r}
 save(result_summary, file = "../output/cv_rmse.Rdata")
 ```
 
+save the result in the cv_rmse.Rdata
 
 ```{r}
 load("../output/cv_rmse.Rdata")
@@ -111,14 +110,7 @@ rmse %>% ggplot(aes(x = epoch, y = RMSE, col = train_test)) + geom_point() + fac
 After matrix factorization, postporcessing will be performed to improve accuracy.
 The referenced papers are:
 
-P1:[Global bias correction](./paper/P4 Large-scale Parallel Collaborative Filtering for the Netflix Prize.pdf) Section 4.1
-
-P2:[Postprocessing SVD with KNN](./paper/P2 Improving regularized singular value decomposition for collaborative filtering .pdf) Section 3.5
-
-P3:[Postprocessing SVD with kernel ridge regression](./paper/P2 Improving regularized singular value decomposition for collaborative filtering .pdf) Section 3.6
-
-P4:[Linearly combination of predictors](./paper/P4 Large-scale Parallel Collaborative Filtering for the Netflix Prize.pdf) Section 4.1
-
+After Cross-validation, we train the model with the best hyper-parameter pair: f = 10, lambda = 0.1
 ```{r, eval= FALSE}
 result <- gradesc(f = 10, lambda = 0.1,lrate = 0.01, max.iter = 40, stopping.deriv = 0.01,
                    data = data, train = data_train, test = data_test)
@@ -126,45 +118,111 @@ result <- gradesc(f = 10, lambda = 0.1,lrate = 0.01, max.iter = 40, stopping.der
 save(result, file = "../output/mat_fac.RData")
 ```
 
+After the training, we have the parameters: p, q, b_i, b_t, b_i,Bin(t), we can construct the prediction matrix for the ratings. In the matrix, each (u,i) has a 23-length array coresponding to the 23 time bins we have previously. In this case, we have the ratings for every user and every movie with respect to time. It is stored in the dynamic_est_rating matrix. 
 ```{r}
-load(file = "../output/mat_fac.RData")
+load("../output/mat_fac.RData")
 
-pred_rating <- t(result$q) %*% result$p
-#define a function to extract the corresponding predictedrating for the test set.
-extract_pred_rating <- function(test_set, pred){
-  pred_rating <- pred[as.character(test_set[2]), as.character(test_set[1])]
-  return(pred_rating)
-}
-#extract predicted rating
-pred_test_rating <- apply(data_test, 1, extract_pred_rating, pred_rating)
+mu <- mean(data[,3])
+est_rating <- t(result$q) %*% result$p
+      
+est_rating <- est_rating  + mu + matrix(t(result$b_item) , length(t(result$b_item)) , dim(est_rating)[2] ) +matrix(result$b_user , dim(est_rating)[1],length(result$b_user),byrow=TRUE)
+      
+      
+## Inclusing the time dynamicof items:
+      
+dynamic_est_rating  = matrix(list(),dim(est_rating)[1] , dim(est_rating)[2])
+  for (i in 1:dim(est_rating)[1])
+    for (u in 1:dim(est_rating)[2]){
+      dynamic_est_rating[i,u][[1]] = est_rating[i,u] + result$b_time[,i]
+        }
+      
+      
+rownames(dynamic_est_rating) <- levels(as.factor(data$movieId))
+colnames(dynamic_est_rating) <- as.character(1:U)
 
-#mean(P)
-pred_mean <- mean(pred_test_rating)
-#mean(test)
-mean_test_rating <- mean(data_test$rating)
+```
 
-#mean(test) - mean(P)
-mean_diff <- mean_test_rating - pred_mean
+And the following csv files (rating_merge_train.csv, rating_merge_test.csv) are the results of the KNN indicated as thr knn column in the below dataframe
 
-data_test$pred <- pred_test_rating
-data_test$pred_adj <- pred_test_rating + mean_diff
+```{r, message=FALSE}
+knn_lm <- read.csv('../output/rating_merge_train.csv')
+knn_lm$b_item <- as.numeric(as.character(knn_lm$b_item))
+knn_lm <- knn_lm[complete.cases(knn_lm), ]
+```
 
-boxplot(data_test$pred_adj ~ data_test$rating)
-#calculate RMSE
-rmse_adj <- sqrt(mean((data_test$rating - data_test$pred_adj)^2))
-cat("The RMSE of the adjusted model is", rmse_adj)
+We run the linear regression on the rating~knn+pq+b_item+b_user+b_time and get the coeffcients for the test set
+```{r}
+ml <- lm(rating~knn+pq+b_item+b_user+b_time,data=knn_lm)
+summary(ml)
+```
+
+We predict the rating for the test set using the coeffecients from the training set and the knn pq b_item b_user b_time values from the below test dataframe and compare the predicted Y_hat with the rating in the test set.
+```{r, message=FALSE}
+knn_lm_test <- read.csv('../output/rating_merge_test.csv')
+knn_lm_test$b_item <- as.numeric(as.character(knn_lm_test$b_item))
+knn_lm_test <- knn_lm_test[complete.cases(knn_lm_test), ]
+```
+
+The Adjusted RMSE is then calculated using the predicted rating and the rating.
+```{r}
+R <- predict(ml,newdata=knn_lm_test[,c(7,8,9,10,11)])
+
+knn_sqrt <- (knn_lm_test$rating-R)^2
+knn_rmse <- sqrt(sum(knn_sqrt,na.rm=TRUE)/length(R))
+
+print(paste0('The RMSE after the post-processing for ther test set is :',knn_rmse))
 ```
 
 
+
+
+### ALS Algorithm with time dynamic Regularization
+
+The ALS Algorithm is done in python by Nicole Mbithe. 
+(refer to notebook doc/ALS implementation.ipynb)   
+And the code also returns p, q, b_i, b_t, b_i,Bin(t) for the ALS Algorithm
+
+
+The Postprocessing part is done by Sixuan Li in Python.
+(refer to notebook file doc/sl_knn_sgd.ipynb)
+Using the output from the previous step and using q to calculate knn And output a csv  file to run linear regression
+
+
+### Step 3: Postprocessing:
+
+ALS Postprocessing:
+
+We load the rating_merge_train_ALS dataframe which includes the 
+```{r, message=FALSE}
+knn_lm_ALS <- read.csv('../output/rating_merge_train_ALS.csv')
+knn_lm_ALS$b_item <- as.numeric(as.character(knn_lm_ALS$b_item))
+knn_lm_ALS <- knn_lm_ALS[complete.cases(knn_lm_ALS), ]
+```
+
+```{r}
+ml_ALS <- lm(rating~knn+pq+b_item+b_user+b_time,data=knn_lm_ALS)
+summary(ml_ALS)
+```
+
+```{r, message=FALSE}
+knn_lm_test_ALS <- read.csv('../output/rating_merge_test_ALS.csv')
+knn_lm_test_ALS$b_item <- as.numeric(as.character(knn_lm_test_ALS$b_item))
+knn_lm_test_ALS <- knn_lm_test_ALS[complete.cases(knn_lm_test_ALS), ]
+```
+
+```{r}
+R_ALS <- predict(ml_ALS,newdata=knn_lm_test_ALS[,c(7,8,9,10,11)])
+
+knn_sqrt_ALS <- (knn_lm_test_ALS$rating-R_ALS)^2
+knn_rmse_ALS <- sqrt(sum(knn_sqrt_ALS,na.rm=TRUE)/length(R_ALS))
+
+print(paste0('The RMSE after the post-processing for ther test set is :',knn_rmse_ALS))
+```
 
 ### Step 4 Evaluation
-You should visualize training and testing RMSE by different dimension of factors and epochs ([One Epoch is when an ENTIRE dataset is passed forward and backward through the neural network only ONCE](https://towardsdatascience.com/epoch-vs-iterations-vs-batch-size-4dfb9c7ce9c9)). 
 
-```{r}
-library(ggplot2)
+We compare the final model of our reconmmender system with SGD and ALS with time dynamic regulization and KNN post processing. 
 
-RMSE <- data.frame(epochs = seq(10, 100, 10), Training_MSE = result$train_RMSE, Test_MSE = result$test_RMSE) %>% gather(key = train_or_test, value = RMSE, -epochs)
+The detailed summary is presented in the below table:
 
-RMSE %>% ggplot(aes(x = epochs, y = RMSE,col = train_or_test)) + geom_point() + scale_x_discrete(limits = seq(10, 100, 10)) + xlim(c(0, 100))
-
-```
+![ ](../figs/summary.jpg) 
