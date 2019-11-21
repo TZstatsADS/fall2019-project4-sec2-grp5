@@ -402,11 +402,7 @@ The Postprocessing part is done by Sixuan Li in Python.
 Using the output from the previous step and using q to calculate knn And output a csv  file to run linear regression
 
 
-
-
-
-
-### Step 3.3: ALS Postprocessing:
+### Step 3.3 Postprocessing
 
 ALS Postprocessing:
 ```{r}
