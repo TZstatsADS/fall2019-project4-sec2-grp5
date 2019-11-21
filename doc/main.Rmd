@@ -144,6 +144,8 @@ colnames(dynamic_est_rating) <- as.character(1:U)
 
 ```
 
+Linear regression: 
+
 And the following csv files (rating_merge_train.csv, rating_merge_test.csv) are the results of the KNN indicated as thr knn column in the below dataframe
 
 ```{r,warning=FASLE}
@@ -405,6 +407,9 @@ Using the output from the previous step and using q to calculate knn And output 
 ### Step 3.3 Postprocessing
 
 ALS Postprocessing:
+
+We load the rating_merge_train_ALS dataframe which includes the the knn, b_item, b_user, b_time value and q*p. From the training set, we fit a linear regression and get the coefficients for the linear regression.
+
 ```{r}
 knn_lm_ALS <- read.csv('../output/rating_merge_train_ALS.csv')
 knn_lm_ALS$b_item <- as.numeric(as.character(knn_lm_ALS$b_item))
@@ -413,11 +418,12 @@ knn_lm_ALS <- knn_lm_ALS[complete.cases(knn_lm_ALS), ]
 knn_lm_ALS %>% head()
 ```
 
+The summary of the linear regression model:
 ```{r}
 ml_ALS <- lm(rating~knn+pq+b_item+b_user+b_time,data=knn_lm_ALS)
 summary(ml_ALS)
 ```
-
+We predicted the rating of the test set using the coeffcients that we have for the training and compare with the actual rating column to calculate the RMSE.
 ```{r}
 knn_lm_test_ALS <- read.csv('../output/rating_merge_test_ALS.csv')
 knn_lm_test_ALS$b_item <- as.numeric(as.character(knn_lm_test_ALS$b_item))
@@ -439,5 +445,7 @@ print(paste0('The RMSE after the post-processing for ther test set is :',knn_rms
 We compare the final model of our reconmmender system with SGD and ALS with time dynamic regulization and KNN post processing. 
 
 The detailed summary is presented in the below table:
+
+We do see that the RMSE decreses after the KNN-postprocessing and the ALS is better in this case in terms of the running time and the RMSE.
 
 ![ ](../figs/summary.jpg) 
