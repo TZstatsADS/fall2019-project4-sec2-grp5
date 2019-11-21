@@ -37,7 +37,7 @@ In this project, we are going to explore matrix factorization methods for recomm
 **Contribution statement**: 
 
 +   Li, Sixuan: Code KNN post-processing, Process data for the final linear regression 
-+   Mathew, Jess:  Prepare slides, set up team meetings
++   Mathew, Jess:  Prepare slides, Set up team meetings
 +   Mbithe, Nicole :  Code the ALS algorithm in Python,   Edit slides, and presenting  
 +   Wu, Qiqi:  Derive the formula for ALS,  Implement ALS  in R    
 +   Xiao, Lihao:  Code the SGD  algorithm, Conduct the linear regression 
