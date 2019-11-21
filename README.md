@@ -27,7 +27,7 @@ In this project, we are going to explore matrix factorization methods for recomm
    
    The project is divided into three steps:
     + Implementing Algorithm, Regularization and Parameter Tuning 
-    	- [SGD](doc/main.rmd) done by Xiao,Lihao and Wu,Qiqi using R [](doc/main.rmd)
+    	- [SGD](doc/main.rmd) done by Xiao,Lihao and Wu,Qiqi using R
 	- [ALS](doc/ALS_implementation.ipynb) done by Mbithe, Nicole and Wu,Qiqi using Python
     + Postprocessing 
     	- KNN done by Sixuan,Li using Python (sl_knn_sgd.ipynb)
