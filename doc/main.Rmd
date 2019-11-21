@@ -45,7 +45,7 @@ data_test <- data[test_idx,]
 ```
 
 
-### SDG Algorithm with time dynamic Regularization
+### Step 2: SDG Algorithm with time dynamic Regularization
 
 #### Step 2.1 Algorithm and Regularization
 Here I perform stochastic gradien descent to do matrix factorization.
@@ -110,7 +110,7 @@ rmse$epoch <- as.numeric(gsub("X", "", rmse$epoch))
 rmse %>% ggplot(aes(x = epoch, y = RMSE, col = train_test)) + geom_point() + facet_grid(~par)
 ```
 
-### Step 3 Postprocessing
+#### Step 2.3 Postprocessing
 After matrix factorization, postporcessing will be performed to improve accuracy.
 The referenced papers are:
 
@@ -181,13 +181,13 @@ print(paste0('The RMSE after the post-processing for ther test set is :',knn_rms
 
 
 
-### ALS Algorithm with time dynamic Regularization
+### Step 3: ALS Algorithm with time dynamic Regularization
 
 The ALS Algorithm is done in python by Nicole Mbithe. 
 (refer to notebook doc/ALS implementation.ipynb)   
 And the code also returns p, q, b_i, b_t, b_i,Bin(t) for the ALS Algorithm
 
-#### Step 1:
+
 ```{r}
 #library("devtools")
 #install.packages("devtools", repos = "http://cran.us.r-project.org")
@@ -199,7 +199,7 @@ py_install("matplotlib")
 py_install("seaborn")
 ```
 
-
+#### Step 3.1: Algorithm and Regularization functions
 
 ```{python}
 import pandas as pd
@@ -367,6 +367,7 @@ def cv(X, K, f, lambda_):
     return train_errors, test_errors
 ```
 
+#### Step 3.2 Cross validation to select the best hyperparameter pair
 
 ```{python,eval=FALSE}
 #run the cross validation and test
@@ -405,7 +406,7 @@ Using the output from the previous step and using q to calculate knn And output 
 
 
 
-### Step 3: Postprocessing:
+### Step 3.3: ALS Postprocessing:
 
 ALS Postprocessing:
 ```{r}
