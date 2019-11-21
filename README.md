@@ -30,7 +30,7 @@ In this project, we are going to explore matrix factorization methods for recomm
     	+ SGD done by Xiao,Lihao and Wu,Qiqi using R. [SGD](doc/main.rmd)
 	+ ALS done by Mbithe, Nicole and Wu,Qiqi using Python. [ALS](doc/ALS_implementation.ipynb) 
     + Postprocessing 
-    	+ KNN and data processing for doing linear regression done by Sixuan,Li using Python (sl_knn_sgd.ipynb & sl_knn_als.ipynb) 
+    	+ KNN and data processing for linear regression done by Sixuan,Li using Python (sl_knn_sgd.ipynb & sl_knn_als.ipynb) 
     + Evaluation
    
 
