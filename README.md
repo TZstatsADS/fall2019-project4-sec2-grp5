@@ -25,7 +25,7 @@ In this project, we are going to explore matrix factorization methods for recomm
      
    The data we use, created by 610 users,  is achieved from [MovieLens] on September 26, 2018. These data contains 100836 ratings and 3683 tag   applications across 9742 movies between March 29, 1996 and September 24, 2018. 
    
-   The project is divided into three steps:
+  **The project is divided into three steps**:
     + Implementing Algorithm, Regularization and Parameter Tuning 
     
     + Postprocessing 
