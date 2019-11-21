@@ -32,6 +32,7 @@ In this project, we are going to explore matrix factorization methods for recomm
     + Postprocessing 
     	+ KNN and data processing for linear regression done by Sixuan,Li using Python (doc/sl_knn_sgd.ipynb & sl_knn_als.ipynb) 
     + Evaluation
+    	+ Linear Regression done by Xiao, Lihao using R (doc/main.rmd)
    
 
 **Contribution statement**:[default] All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
