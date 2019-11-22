@@ -36,11 +36,11 @@ In this project, we are going to explore matrix factorization methods for recomm
 
 **Contribution statement**: 
 
-+   Li, Sixuan: Code KNN post-processing, Process data for the final linear regression 
++   Li, Sixuan: Code KNN post-processing, Process data for the final linear regression in Python
 +   Mathew, Jess: Prepare slides, Set up team meetings
 +   Mbithe, Nicole: Code the ALS algorithm in Python,  Edit slides, and Do the presentation
 +   Wu, Qiqi: Derive the formula for ALS,  Implement ALS  in R    
-+   Xiao, Lihao: Code the SGD algorithm, Conduct the linear regression 
++   Xiao, Lihao: Code the SGD algorithm, Conduct the linear regression in R
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
